@@ -1,0 +1,118 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+    Name = "SparkSnaps Moveset",
+    LoadingTitle = "SparkSnaps Moveset",
+    LoadingSubtitle = "by SparkSnaps",
+    Theme = "Light",
+    ConfigurationSaving = { Enabled = true, FileName = "Big Diddy" },
+    KeySystem = false,
+})
+
+local MainTab = Window:CreateTab("đź”ĄSPARKSNAPS MOVES", 4483362458)
+local MainSection = MainTab:CreateSection("đź”Ą Moveset đź”Ą")
+
+-- Button with mobile drag
+local button = MainSection:CreateButton({
+    Name = "Activate Punch Move",
+    Callback = function()
+        -- Activate punch move and glowing effects
+        local character = game.Players.LocalPlayer.Character
+        local leftHand = character:WaitForChild("LeftHand")
+        local rightHand = character:WaitForChild("RightHand")
+
+        -- Activate glowing effect on hands
+        createGlowingEffect(leftHand)
+        createGlowingEffect(rightHand)
+
+        -- Play punch animation
+        playPunchAnimation()
+    end,
+})
+
+-- Function to make the button draggable (mobile-friendly)
+local function makeButtonDraggable(button)
+    local UIS = game:GetService("UserInputService")
+    local dragInput, dragStart, startPos
+
+    button.MouseButton1Down:Connect(function(input)
+        dragStart = input.Position
+        startPos = button.Position
+        dragInput = UIS.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                local delta = input.Position - dragStart
+                button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end)
+    end)
+
+    button.MouseButton1Up:Connect(function()
+        if dragInput then
+            dragInput:Disconnect()
+        end
+    end)
+end
+
+makeButtonDraggable(button)
+
+-- Create glowing effect for hands
+function createGlowingEffect(hand)
+    -- Create a glowing part (MeshPart)
+    local glowPart = Instance.new("Part")
+    glowPart.Shape = Enum.PartType.Ball
+    glowPart.Size = Vector3.new(2, 2, 2)  -- Adjust size for effect
+    glowPart.Material = Enum.Material.Neon
+    glowPart.Color = Color3.fromRGB(255, 0, 0)  -- Red color for glow (change as desired)
+    glowPart.Anchored = true
+    glowPart.CanCollide = false
+    glowPart.Position = hand.Position
+    glowPart.Parent = workspace
+    
+    -- Use a particle emitter for extra effect
+    local particleEmitter = Instance.new("ParticleEmitter")
+    particleEmitter.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))
+    particleEmitter.Size = NumberSequence.new(0.5, 2)
+    particleEmitter.Lifetime = NumberRange.new(0.5)
+    particleEmitter.Rate = 100
+    particleEmitter.Parent = glowPart
+
+    -- Clean up after a short time
+    game.Debris:AddItem(glowPart, 1)  -- Cleanup after 1 second
+end
+
+-- Play the punch animation
+function playPunchAnimation()
+    local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+    local animator = humanoid:FindFirstChildOfClass("Animator") or humanoid:WaitForChild("Animator")
+
+    local punchAnimation = Instance.new("Animation")
+    punchAnimation.AnimationId = "rbxassetid://YOUR_PUNCH_ANIMATION_ID" -- Replace with the punch animation ID
+    local punchAnimTrack = animator:LoadAnimation(punchAnimation)
+    punchAnimTrack:Play()
+end
+
+-- Fade text effect for "SparkSnaps"
+local function createFadeText()
+    local playerGui = game.Players.LocalPlayer.PlayerGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = playerGui
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Text = "SparkSnaps"
+    textLabel.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Red color
+    textLabel.TextSize = 50
+    textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Parent = screenGui
+
+    -- Fade effect
+    for i = 1, 50 do
+        textLabel.TextTransparency = i / 50
+        wait(0.05)
+    end
+
+    screenGui:Destroy()
+end
+
+-- Call fade text function
+createFadeText()
